@@ -1,0 +1,5 @@
+---
+ - hosts: dbservers
+   tasks:
+    - name: ping
+      action: ping

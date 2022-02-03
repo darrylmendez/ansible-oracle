@@ -1,0 +1,28 @@
+---
+
+- name: Check /etc/oratab exists
+  stat:
+    path: /etc/oratab
+  register: etc_oratab
+
+- name: Oracle DB install
+  block:
+
+    - name: Make preparations and install requirements
+      include_tasks: system/prepare.yml
+
+    - name: Create swap file
+      include_tasks: system/swap.yml
+      when: '(oracledb.swapfile_count|int - ansible_swaptotal_mb|int) > 2'
+
+    - name: Adjust kernel parameters and shared memory
+      include_tasks: system/kernel.yml
+
+
+    - name: Oracle DB 19C install
+      include_tasks: oracle.yml
+
+    - name: Postinstall actions
+      include_tasks: system/postinstall.yml
+
+  when: not etc_oratab.stat.exists
